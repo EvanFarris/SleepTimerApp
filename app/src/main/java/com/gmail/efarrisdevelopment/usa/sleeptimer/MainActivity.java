@@ -44,11 +44,11 @@ import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
-    private final String spKey="ef_sleep_timer";
-    private final String idKey="ef_ids";
-    private final String alarmKey="ef_alarms";
-    private final String sleepAction="goToSleep";
-    public final int maxTimer = 600;
+    private final String spKey = "ef_sleep_timer";
+    private final String idKey = "ef_ids";
+    private final String alarmKey = "ef_alarms";
+    private final String sleepAction = "goToSleep";
+    private final int maxTimer = 600;
 
     private int calledFromSeekBar;
     private int activeAlarmPosition;
@@ -59,7 +59,6 @@ public class MainActivity extends AppCompatActivity {
     private ComponentName cName;
     private SharedPreferences prefs;
     private SharedPreferences.Editor prefs_editor;
-    private RecyclerView r;
     private ActiveTimerAdapter rAdapter;
     private ArrayList<Alarm> activeAlarmList;
     private Button canButton;
@@ -133,8 +132,8 @@ public class MainActivity extends AppCompatActivity {
         activeAlarmPosition = -1;
         canButton = findViewById(R.id.cancelButton);
         noActiveTextView = findViewById(R.id.noAlarmView);
-
-        r= findViewById(R.id.AlarmRecyclerView);
+        RecyclerView r;
+        r = findViewById(R.id.AlarmRecyclerView);
         rAdapter = new ActiveTimerAdapter(activeAlarmList,this);
 
         r.setLayoutManager(new LinearLayoutManager(this));
@@ -193,14 +192,8 @@ public class MainActivity extends AppCompatActivity {
             int index;
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if(i2 == 0)
-                {
-                    index = i == 0 ? 0 : 1;
-                }
-                else
-                {
-                    index = i+1;
-                }
+                if(i2 == 0) {index = i == 0 ? 0 : 1;}
+                else {index = i+1;}
             }
 
             @Override
@@ -211,27 +204,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable editable) {
                 calledFromSeekBar = 0;
-                if(timeTextView.getText().toString().equals(""))
-                {
-                    timeSeek.setProgress(0);
-                }
-                else
-                {
-                    if(timeTextView.getText().toString().charAt(0) == '0')
-                    {
+                if(timeTextView.getText().toString().equals("")) {timeSeek.setProgress(0);}
+                else {
+                    if(timeTextView.getText().toString().charAt(0) == '0') {
                         timeTextView.setText(timeTextView.getText().subSequence(1,timeTextView.getText().length()));
-                    }
-                    else
-                    {
+                    } else {
                         int time = Integer.parseInt(timeTextView.getText().toString());
-                        if(time > 600)
-                        {
+                        if(time > 600) {
                             timeSeek.setProgress(maxTimer);
                             timeTextView.setText(String.valueOf(maxTimer));
                             Selection.setSelection(editable,timeTextView.length());
                         }
-                        else
-                        {
+                        else {
                             timeSeek.setProgress(time);
                             Selection.setSelection(editable,index);
                         }
@@ -257,15 +241,13 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Permission not found",Toast.LENGTH_LONG).show();
             } else {
                 if(!timeTextView.getText().toString().equals("")) {
-                    AlarmManager alarmM;
-                    Intent intent  = new Intent(this,SleepReceiver.class);
-                    intent.setAction(sleepAction);
                     final int id = (int) Calendar.getInstance().getTimeInMillis();
+                    Intent intent  = new Intent(this, SleepReceiver.class);
+                    intent.setAction(sleepAction);
                     PendingIntent alarmIntent = PendingIntent.getBroadcast(this,id,intent,PendingIntent.FLAG_IMMUTABLE);
-                    Context context = getApplicationContext();
-                    long alarmTime = Calendar.getInstance().getTimeInMillis() + Long.parseLong(timeTextView.getText().toString()) * 60 * 1000;
+                    long alarmTime = Calendar.getInstance().getTimeInMillis() + Long.parseLong(timeTextView.getText().toString()) * 60000;
 
-                    alarmM = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+                    AlarmManager alarmM = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
                     alarmM.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, alarmTime, alarmIntent);
                     activeAlarmList.add(new Alarm(alarmTime,id));
                     activeAlarmList.sort(new AlarmComparator());
@@ -279,22 +261,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void cancelAlarm(View v) {
-        if(activeAlarmPosition != -1)
-        {
+        if(activeAlarmPosition != -1) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             long timerToCancel = activeAlarmList.get(activeAlarmPosition).getTime();
             String dfString = "Ending time: " + android.text.format.DateFormat.getTimeFormat(this).format(new Date(timerToCancel));
             builder.setTitle(R.string.cancel_confirmation).setMessage(dfString);
             builder.setPositiveButton(R.string.yes, (dialogInterface, i) -> {
                 long curTime = Calendar.getInstance().getTimeInMillis();
-                if(curTime < timerToCancel)
-                {
-                    AlarmManager alarmM;
-                    Intent intent  = new Intent(getApplicationContext(),SleepReceiver.class);
+                if(curTime < timerToCancel) {
+                    Intent intent = new Intent(this,SleepReceiver.class);
                     intent.setAction(sleepAction);
-                    Context context = getApplicationContext();
-                    PendingIntent alarmIntent = PendingIntent.getBroadcast(context,activeAlarmList.get(activeAlarmPosition).getId(),intent,PendingIntent.FLAG_IMMUTABLE);
-                    alarmM = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+                    PendingIntent alarmIntent = PendingIntent.getBroadcast(this,activeAlarmList.get(activeAlarmPosition).getId(),intent,PendingIntent.FLAG_IMMUTABLE);
+                    AlarmManager alarmM = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
 
                     alarmM.cancel(alarmIntent);
                     activeAlarmList.remove(activeAlarmPosition);
@@ -306,10 +284,7 @@ public class MainActivity extends AppCompatActivity {
                         disableButton();
                     }
                 }
-
-            }).setNegativeButton(R.string.no, (dialogInterface, i) -> {
-
-            });
+            }).setNegativeButton(R.string.no, (dialogInterface, i) -> {});
             builder.create().show();
         }
     }
