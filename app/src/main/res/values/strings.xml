@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Sleep Timer</string>
+    <string name="turnPhoneOffIn">Turn phone off in </string>
+    <string name="switch_at">Turn phone off </string>
+    <string name="minutes">minutes</string>
+    <string name="sleepButton">Set Sleep Timer</string>
+    <string name="timerHelperMessage">Number of minutes until the phone is put to sleep</string>
+    <string name="inText">in</string>
+    <string name="atText">at</string>
+    <string name="timeEditViewHint">1 to 600</string>
+    <string name="timeRemaining">Time remaining: </string>
+    <string name="clockTime">Clock Time</string>
+    <string name="active_timer">Active Timers</string>
+    <string name="cancel_text">Cancel Timer</string>
+    <string name="edit_text">Edit Alarm</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="no_alarm">No active alarms.</string>
+</resources>

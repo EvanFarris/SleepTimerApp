@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_alignParentEnd="false"
+    android:foregroundGravity="right"
+    tools:context="com.gmail.efarrisdevelopment.usa.sleeptimer.MainActivity">
+
+    <SeekBar
+        android:id="@+id/timeBar"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginEnd="-32dp"
+        android:max="600"
+        app:layout_constraintEnd_toEndOf="@+id/textView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+    <TextView
+        android:id="@+id/minuteText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="@string/minutes"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toBottomOf="@+id/minuteTextBox"
+        app:layout_constraintEnd_toEndOf="@+id/timeBar"
+        app:layout_constraintTop_toTopOf="@+id/minuteTextBox" />
+
+    <EditText
+        android:id="@+id/minuteTextBox"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="44dp"
+        android:layout_marginEnd="16dp"
+        android:autofillHints="1"
+        android:ems="10"
+        android:hint="@string/timeEditViewHint"
+        android:inputType="number"
+        android:minHeight="48dp"
+        android:textAlignment="center"
+        android:textSize="36sp"
+        android:tooltipText="@string/timerHelperMessage"
+        app:layout_constraintEnd_toStartOf="@+id/minuteText"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/timeBar"
+        app:layout_constraintTop_toBottomOf="@+id/timeBar"
+        app:layout_constraintVertical_bias="0.0"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <Button
+        android:id="@+id/sleepButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:onClick="clickSleepTimer"
+        android:scaleX="1"
+        android:scaleY="1"
+        android:text="@string/sleepButton"
+        android:textSize="32sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/minuteTextBox"
+        app:layout_constraintVertical_bias="0.36" />
+
+
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="@string/turnPhoneOffIn"
+        android:textSize="36sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.13"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/AlarmRecyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="16dp"
+        android:scrollbars="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/cancelButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/activeTimerText"
+        app:layout_constraintTop_toBottomOf="@+id/activeTimerText"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/activeTimerText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/active_timer"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.62"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/textView" />
+
+    <Button
+        android:id="@+id/cancelButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="cancelAlarm"
+        android:text="@string/cancel_text"
+        android:textSize="32sp"
+        app:layout_constraintBottom_toBottomOf="@+id/sleepButton"
+        app:layout_constraintEnd_toEndOf="@+id/AlarmRecyclerView"
+        app:layout_constraintStart_toStartOf="@+id/AlarmRecyclerView"
+        app:layout_constraintTop_toTopOf="@+id/sleepButton" />
+
+    <TextView
+        android:id="@+id/noAlarmView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/no_alarm"
+        android:textSize="28sp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/AlarmRecyclerView"
+        app:layout_constraintEnd_toEndOf="@+id/AlarmRecyclerView"
+        app:layout_constraintStart_toStartOf="@+id/AlarmRecyclerView"
+        app:layout_constraintTop_toTopOf="@+id/AlarmRecyclerView" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
