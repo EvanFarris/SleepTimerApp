@@ -9,8 +9,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.gmail.efarrisdevelopment.usa.sleeptimer.R;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -19,15 +17,11 @@ import java.util.Date;
 public class ActiveTimerAdapter extends RecyclerView.Adapter<ActiveTimerViewHolder> {
 
     private final ArrayList<Alarm> alarmList;
-    private int lastSelected;
-    private Context context;
     private View lastView;
-    public ActiveTimerAdapter(ArrayList<Alarm> aList, Context context)
-    {
+
+    public ActiveTimerAdapter(ArrayList<Alarm> aList, Context context) {
         alarmList=aList;
         lastView = null;
-        lastSelected= -1;
-        this.context = context;
     }
 
     @NonNull
@@ -41,50 +35,42 @@ public class ActiveTimerAdapter extends RecyclerView.Adapter<ActiveTimerViewHold
     public void onBindViewHolder(@NonNull ActiveTimerViewHolder holder, int position) {
         int pos = position;
         long timer = alarmList.get(position).getTime();
-        Calendar c = Calendar.getInstance();
-        long cTime = c.getTimeInMillis();
-        long timeRemaining = timer - cTime;
-        timeRemaining = (long) Math.ceil((double) (timeRemaining/60000));
-        String trStr = "(" + timeRemaining+ " minute";
-        if(timeRemaining > 1)
-            trStr+="s";
-        trStr+=")";
-        String dfTime = android.text.format.DateFormat.getTimeFormat(context).format(new Date(timer));
+        long timeRemaining = timer - Calendar.getInstance().getTimeInMillis();
+
+        timeRemaining = (long) Math.ceil(((double) timeRemaining / 60000.0));
+
+        String trStr = "(" + timeRemaining + " minute";
+        if(timeRemaining > 1) {trStr += "s";}
+        trStr += ")";
+
+        String dfTime = android.text.format.DateFormat.getTimeFormat(holder.timeRemaining.getContext()).format(new Date(timer));
+
         holder.clockTime.setText(dfTime);
         holder.timeRemaining.setText(trStr);
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(lastView!=null)
-                {
-                    lastView.setBackgroundColor(Color.TRANSPARENT);
-                }
-                MainActivity m = (MainActivity) view.getContext();
-                int maPos = m.getActiveAlarmPosition();
-                if(maPos == pos)
-                {
-                    m.setActiveAlarmPosition(-1,0);
-                    view.setBackgroundColor(Color.TRANSPARENT);
-                    lastView = null;
-                }
-                else
-                {
-                    m.setActiveAlarmPosition(pos,timer);
-                    view.setBackgroundColor(Color.GRAY);
-                }
-                lastView = view;
+        holder.itemView.setOnClickListener(view -> {
+            if(lastView != null) {
+                lastView.setBackgroundColor(Color.TRANSPARENT);
             }
+
+            MainActivity m = (MainActivity) view.getContext();
+            int maPos = m.getActiveAlarmPosition();
+
+            if(maPos == pos) {
+                m.setActiveAlarmPosition(-1, 0);
+                view.setBackgroundColor(Color.TRANSPARENT);
+                lastView = null;
+            } else {
+                m.setActiveAlarmPosition(pos, timer);
+                view.setBackgroundColor(Color.GRAY);
+            }
+            lastView = view;
         });
 
     }
 
-
     @Override
-    public int getItemCount() {
-        return alarmList.size();
-    }
-    public void setLastViewBackgroundTransparent()
-    {
+    public int getItemCount() {return alarmList.size();}
+    public void setLastViewBackgroundTransparent() {
         lastView.setBackgroundColor(Color.TRANSPARENT);
         lastView = null;
     }

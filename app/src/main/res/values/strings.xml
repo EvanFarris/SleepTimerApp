@@ -16,4 +16,5 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="no_alarm">No active alarms.</string>
+    <string name="cancel_confirmation">Are you sure you want to cancel this timer?</string>
 </resources>

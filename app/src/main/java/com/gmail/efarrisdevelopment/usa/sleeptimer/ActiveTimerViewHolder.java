@@ -10,11 +10,10 @@ import com.gmail.efarrisdevelopment.usa.sleeptimer.R;
 public class ActiveTimerViewHolder extends RecyclerView.ViewHolder {
     public TextView timeRemaining,clockTime;
 
-    public ActiveTimerViewHolder(View v)
-    {
+    public ActiveTimerViewHolder(View v) {
         super(v);
-        timeRemaining=v.findViewById(R.id.timeRemainingView);
-        clockTime=v.findViewById(R.id.clockRemaining);
+        timeRemaining = v.findViewById(R.id.timeRemainingView);
+        clockTime = v.findViewById(R.id.clockRemaining);
     }
 
 

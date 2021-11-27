@@ -2,8 +2,6 @@ package com.gmail.efarrisdevelopment.usa.sleeptimer;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
-
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -17,7 +15,6 @@ import android.app.PendingIntent;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -81,50 +78,49 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
         Set<String> timeList = new HashSet<>();
         Set<String> idList = new HashSet<>();
-        for(Alarm a : activeAlarmList)
-        {
+
+        for(Alarm a : activeAlarmList) {
             timeList.add(String.valueOf(a.getTime()));
             idList.add(String.valueOf(a.getId()));
         }
-        prefs_editor.putStringSet(alarmKey,timeList);
-        prefs_editor.putStringSet(idKey,idList);
+
+        prefs_editor.putStringSet(alarmKey, timeList);
+        prefs_editor.putStringSet(idKey, idList);
         prefs_editor.commit();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        activeAlarmList.clear();
         Set<String> timeSet = prefs.getStringSet(alarmKey,null);
         Set<String> idSet = prefs.getStringSet(idKey,null);
-        long curTime = Calendar.getInstance().getTimeInMillis() ;
-        if(timeSet != null && idSet !=null)
-        {
+        long curTime = Calendar.getInstance().getTimeInMillis();
+
+        activeAlarmList.clear();
+
+        if(timeSet != null && idSet !=null) {
             ArrayList<Long> timeList = new ArrayList<>();
             ArrayList<Integer> idList = new ArrayList<>();
-            for(String s : timeSet)
-            {
+
+            for(String s : timeSet) {
                 timeList.add(Long.parseLong(s));
             }
-            for(String s: idSet)
-            {
+            for(String s: idSet) {
                 idList.add(Integer.parseInt(s));
             }
             for(int i = 0; i < timeList.size(); i++) {
                 if (timeList.get(i) > curTime)
                     activeAlarmList.add(new Alarm(timeList.get(i), idList.get(i)));
             }
-            if(activeAlarmList.isEmpty())
-                disableButton();
-            else
-                enableButton();
+            if(activeAlarmList.isEmpty()) {disableButton();}
+            else {enableButton();}
+
             rAdapter.notifyDataSetChanged();
         }
 
     }
 
-    public void initializeVariables()
-    {
+    public void initializeVariables() {
         timeSeek = findViewById(R.id.timeBar);
         timeTextView = findViewById(R.id.minuteTextBox);
         cName = new ComponentName(this, SleepReceiver.class);
@@ -144,34 +140,27 @@ public class MainActivity extends AppCompatActivity {
         r.setLayoutManager(new LinearLayoutManager(this));
         r.setAdapter(rAdapter);
 
-
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.SET_ALARM) != PERMISSION_GRANTED)
-        {
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.SET_ALARM) != PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.SET_ALARM},1);
         }
         if(!active)
             createAdmin();
-
-
     }
 
 
-    public void createAdmin()
-    {
+    public void createAdmin() {
         Intent i = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
         i.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN,cName);
         i.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION,"The sleep timer locks your phone once the timer ends.");
         startActivity(i);
     }
-    public void closeKeyboard()
-    {
+
+    public void closeKeyboard() {
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(timeTextView.getWindowToken(),0);
     }
 
-
-    public void setListeners()
-    {
+    public void setListeners() {
         timeSeek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
@@ -179,9 +168,7 @@ public class MainActivity extends AppCompatActivity {
                     timeTextView.setText(String.valueOf(i));
                     closeKeyboard();
                     timeTextView.clearFocus();
-                }
-                else
-                    calledFromSeekBar = 1;
+                } else {calledFromSeekBar = 1;}
                 seekBar.setProgress(i);
             }
 
@@ -252,33 +239,23 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
-
     }
 
-    public void clearFields()
-    {
+    public void clearFields() {
         timeTextView.setText("");
         timeSeek.setProgress(0);
         closeKeyboard();
     }
 
-    public void clickSleepTimer(View v)
-    {
+    public void clickSleepTimer(View v) {
         active = dpm.isAdminActive(cName);
-        if(!active)
-        {
+        if(!active) {
             createAdmin();
-        }
-        else
-        {
-            if(ContextCompat.checkSelfPermission(this, Manifest.permission.SET_ALARM) != PERMISSION_GRANTED)
-            {
+        } else {
+            if(ContextCompat.checkSelfPermission(this, Manifest.permission.SET_ALARM) != PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.SET_ALARM},123);
                 Toast.makeText(this, "Permission not found",Toast.LENGTH_LONG).show();
-            }
-            else
-            {
+            } else {
                 if(!timeTextView.getText().toString().equals("")) {
                     AlarmManager alarmM;
                     Intent intent  = new Intent(this,SleepReceiver.class);
@@ -301,75 +278,55 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void cancelAlarm(View v)
-    {
-
+    public void cancelAlarm(View v) {
         if(activeAlarmPosition != -1)
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             long timerToCancel = activeAlarmList.get(activeAlarmPosition).getTime();
             String dfString = "Ending time: " + android.text.format.DateFormat.getTimeFormat(this).format(new Date(timerToCancel));
-            builder.setTitle("Are you sure you want to cancel this timer?").setMessage(dfString);
-            builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    long curTime = Calendar.getInstance().getTimeInMillis();
-                    if(curTime < timerToCancel)
-                    {
-                        AlarmManager alarmM;
-                        Intent intent  = new Intent(getApplicationContext(),SleepReceiver.class);
-                        intent.setAction(sleepAction);
-                        Context context = getApplicationContext();
-                        PendingIntent alarmIntent = PendingIntent.getBroadcast(context,activeAlarmList.get(activeAlarmPosition).getId(),intent,PendingIntent.FLAG_IMMUTABLE);
-                        alarmM = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            builder.setTitle(R.string.cancel_confirmation).setMessage(dfString);
+            builder.setPositiveButton(R.string.yes, (dialogInterface, i) -> {
+                long curTime = Calendar.getInstance().getTimeInMillis();
+                if(curTime < timerToCancel)
+                {
+                    AlarmManager alarmM;
+                    Intent intent  = new Intent(getApplicationContext(),SleepReceiver.class);
+                    intent.setAction(sleepAction);
+                    Context context = getApplicationContext();
+                    PendingIntent alarmIntent = PendingIntent.getBroadcast(context,activeAlarmList.get(activeAlarmPosition).getId(),intent,PendingIntent.FLAG_IMMUTABLE);
+                    alarmM = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
-                        alarmM.cancel(alarmIntent);
-                        activeAlarmList.remove(activeAlarmPosition);
-                        rAdapter.notifyItemRemoved(activeAlarmPosition);
-                        activeAlarmPosition = -1;
-                        rAdapter.setLastViewBackgroundTransparent();
-                        clearFields();
-                        if(activeAlarmList.isEmpty()){
-                            disableButton();
-                        }
+                    alarmM.cancel(alarmIntent);
+                    activeAlarmList.remove(activeAlarmPosition);
+                    rAdapter.notifyItemRemoved(activeAlarmPosition);
+                    activeAlarmPosition = -1;
+                    rAdapter.setLastViewBackgroundTransparent();
+                    clearFields();
+                    if(activeAlarmList.isEmpty()){
+                        disableButton();
                     }
-
                 }
-            }).setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
 
-                        }
-                    });
+            }).setNegativeButton(R.string.no, (dialogInterface, i) -> {
+
+            });
             builder.create().show();
         }
     }
 
-    public void setActiveAlarmPosition(int pos, long timer)
-    {
-        if(pos!=-1)
-        {
-            if(activeAlarmList.get(pos).getTime() == timer)
-                activeAlarmPosition = pos;
-        }
-        else
-            activeAlarmPosition = pos;
-
-
+    public void setActiveAlarmPosition(int pos, long timer) {
+        if(pos == -1 || activeAlarmList.get(pos).getTime() == timer) {activeAlarmPosition = pos;}
     }
 
-    public int getActiveAlarmPosition()
-    {
-        return activeAlarmPosition;
-    }
+    public int getActiveAlarmPosition() {return activeAlarmPosition;}
 
-    public void disableButton(){
+    public void disableButton() {
         canButton.setBackgroundColor(Color.GRAY);
         canButton.setClickable(false);
         noActiveTextView.setVisibility(View.VISIBLE);
     }
 
-    public void enableButton(){
+    public void enableButton() {
         canButton.setBackgroundColor(Color.BLUE);
         canButton.setClickable(true);
         noActiveTextView.setVisibility(View.INVISIBLE);

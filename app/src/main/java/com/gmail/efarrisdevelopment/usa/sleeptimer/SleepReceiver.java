@@ -11,8 +11,7 @@ import android.media.AudioManager;
 public class SleepReceiver extends DeviceAdminReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        if(intent.getAction().equals("goToSleep"))
-        {
+        if(intent.getAction().equals("goToSleep")) {
                 DevicePolicyManager dpm = (DevicePolicyManager) context.getApplicationContext().getSystemService(Context.DEVICE_POLICY_SERVICE);
                 dpm.lockNow();
 
