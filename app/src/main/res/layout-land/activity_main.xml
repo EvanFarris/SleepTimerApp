@@ -8,16 +8,6 @@
     android:foregroundGravity="right"
     tools:context="com.gmail.efarrisdevelopment.usa.sleeptimer.MainActivity">
 
-    <SeekBar
-        android:id="@+id/timeBar"
-        android:layout_width="0dp"
-        android:layout_height="30dp"
-        android:layout_marginTop="32dp"
-        android:max="600"
-        app:layout_constraintEnd_toEndOf="@+id/textView"
-        app:layout_constraintStart_toStartOf="@+id/textView"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
-
     <TextView
         android:id="@+id/minuteText"
         android:layout_width="wrap_content"
@@ -32,7 +22,7 @@
         android:id="@+id/minuteTextBox"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="64dp"
         android:autofillHints="1"
         android:ems="10"
         android:hint="@string/timeEditViewHint"
@@ -42,14 +32,14 @@
         android:textSize="26sp"
         android:tooltipText="@string/timerHelperMessage"
         app:layout_constraintStart_toStartOf="@+id/textView"
-        app:layout_constraintTop_toBottomOf="@+id/timeBar"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
         tools:ignore="SpeakableTextPresentCheck" />
 
     <Button
         android:id="@+id/sleepButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
+        android:layout_marginTop="64dp"
         android:onClick="clickSleepTimer"
         android:scaleX="1"
         android:scaleY="1"
@@ -58,16 +48,14 @@
         app:layout_constraintEnd_toEndOf="@+id/minuteText"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="@+id/minuteTextBox"
-        app:layout_constraintTop_toBottomOf="@+id/minuteTextBox"
-        app:layout_constraintVertical_bias="0.56" />
-
+        app:layout_constraintTop_toBottomOf="@+id/minuteTextBox" />
 
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="64dp"
         android:text="@string/turnPhoneOffIn"
         android:textSize="28sp"
         app:layout_constraintEnd_toEndOf="parent"

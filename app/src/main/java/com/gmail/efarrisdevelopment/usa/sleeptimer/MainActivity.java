@@ -25,7 +25,6 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,10 +49,8 @@ public class MainActivity extends AppCompatActivity {
     private final String sleepAction = "goToSleep";
     private final int maxTimer = 600;
 
-    private int calledFromSeekBar;
     private int activeAlarmPosition;
     private boolean active;
-    private SeekBar timeSeek;
     private TextView timeTextView;
     private DevicePolicyManager dpm;
     private ComponentName cName;
@@ -117,15 +114,12 @@ public class MainActivity extends AppCompatActivity {
             rAdapter.notifyItemRangeChanged(0,activeAlarmList.size());
         }
         if(activeAlarmList.size() == 0) {alarmID = 0;}
-
     }
 
     public void initializeVariables() {
-        timeSeek = findViewById(R.id.timeBar);
         timeTextView = findViewById(R.id.minuteTextBox);
         cName = new ComponentName(this, SleepReceiver.class);
         dpm = (DevicePolicyManager)getSystemService(Context.DEVICE_POLICY_SERVICE);
-        calledFromSeekBar = -1;
         active = dpm.isAdminActive(cName);
         prefs = getSharedPreferences(spKey,Context.MODE_PRIVATE);
         prefs_editor = prefs.edit();
@@ -133,8 +127,7 @@ public class MainActivity extends AppCompatActivity {
         activeAlarmPosition = -1;
         canButton = findViewById(R.id.cancelButton);
         noActiveTextView = findViewById(R.id.noAlarmView);
-        RecyclerView r;
-        r = findViewById(R.id.AlarmRecyclerView);
+        RecyclerView r = findViewById(R.id.AlarmRecyclerView);
         rAdapter = new ActiveTimerAdapter(activeAlarmList,this);
         alarmID = -1;
 
@@ -144,8 +137,7 @@ public class MainActivity extends AppCompatActivity {
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.SET_ALARM) != PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.SET_ALARM},1);
         }
-        if(!active)
-            createAdmin();
+        if(!active) {createAdmin();}
     }
 
 
@@ -162,40 +154,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setListeners() {
-        timeSeek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                if(calledFromSeekBar == 1) {
-                    timeTextView.setText(String.valueOf(i));
-                    closeKeyboard();
-                    timeTextView.clearFocus();
-                } else {calledFromSeekBar = 1;}
-                seekBar.setProgress(i);
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                if(timeTextView.getText().toString().equals(""))
-                {
-                    if(seekBar.getProgress()!= 0)
-                        seekBar.setProgress(0);
-                }
-                else if(Integer.parseInt(timeTextView.getText().toString()) != seekBar.getProgress())
-                    timeTextView.setText(String.valueOf(seekBar.getProgress()));
-            }
-        });
-
         timeTextView.addTextChangedListener(new TextWatcher() {
             int index;
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 if(i2 == 0) {index = i == 0 ? 0 : 1;}
-                else {index = i+1;}
+                else {index = i + 1;}
             }
 
             @Override
@@ -205,21 +169,17 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                calledFromSeekBar = 0;
-                if(timeTextView.getText().toString().equals("")) {timeSeek.setProgress(0);}
-                else {
+                if(!timeTextView.getText().toString().equals("")) {
                     if(timeTextView.getText().toString().charAt(0) == '0') {
-                        timeTextView.setText(timeTextView.getText().subSequence(1,timeTextView.getText().length()));
+                        timeTextView.setText(timeTextView.getText().subSequence(1, timeTextView.getText().length()));
                     } else {
                         int time = Integer.parseInt(timeTextView.getText().toString());
-                        if(time > 600) {
-                            timeSeek.setProgress(maxTimer);
+                        if(time > maxTimer) {
                             timeTextView.setText(String.valueOf(maxTimer));
-                            Selection.setSelection(editable,timeTextView.length());
+                            Selection.setSelection(editable, timeTextView.getText().length());
                         }
                         else {
-                            timeSeek.setProgress(time);
-                            Selection.setSelection(editable,index);
+                            Selection.setSelection(editable, index);
                         }
                     }
                 }
@@ -229,7 +189,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void clearFields() {
         timeTextView.setText("");
-        timeSeek.setProgress(0);
         closeKeyboard();
     }
 

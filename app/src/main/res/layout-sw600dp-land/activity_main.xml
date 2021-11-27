@@ -8,36 +8,21 @@
     android:foregroundGravity="right"
     tools:context="com.gmail.efarrisdevelopment.usa.sleeptimer.MainActivity">
 
-    <SeekBar
-        android:id="@+id/timeBar"
-        android:layout_width="0dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="64dp"
-        android:layout_marginTop="48dp"
-        android:layout_marginEnd="-32dp"
-        android:max="600"
-        app:layout_constraintEnd_toEndOf="@+id/textView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
-
     <TextView
         android:id="@+id/minuteText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
+        android:layout_marginStart="32dp"
         android:text="@string/minutes"
         android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="@+id/minuteTextBox"
-        app:layout_constraintEnd_toEndOf="@+id/timeBar"
+        app:layout_constraintStart_toEndOf="@+id/minuteTextBox"
         app:layout_constraintTop_toTopOf="@+id/minuteTextBox" />
 
     <EditText
         android:id="@+id/minuteTextBox"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="44dp"
-        android:layout_marginEnd="16dp"
+        android:layout_width="245dp"
+        android:layout_height="84dp"
         android:autofillHints="1"
         android:ems="10"
         android:hint="@string/timeEditViewHint"
@@ -46,12 +31,11 @@
         android:textAlignment="center"
         android:textSize="36sp"
         android:tooltipText="@string/timerHelperMessage"
-        app:layout_constraintEnd_toStartOf="@+id/minuteText"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/timeBar"
-        app:layout_constraintTop_toBottomOf="@+id/timeBar"
-        app:layout_constraintVertical_bias="0.0"
-        tools:ignore="SpeakableTextPresentCheck" />
+        app:layout_constraintEnd_toEndOf="@+id/textView"
+        app:layout_constraintStart_toStartOf="@+id/textView"
+        tools:ignore="SpeakableTextPresentCheck"
+        tools:layout_editor_absoluteY="189dp" />
+
 
     <Button
         android:id="@+id/sleepButton"
@@ -63,13 +47,12 @@
         android:scaleY="1"
         android:text="@string/sleepButton"
         android:textSize="32sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.1"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/textView"
+        app:layout_constraintHorizontal_bias="0.314"
+        app:layout_constraintStart_toStartOf="@+id/textView"
         app:layout_constraintTop_toBottomOf="@+id/minuteTextBox"
-        app:layout_constraintVertical_bias="0.36" />
-
-
+        app:layout_constraintVertical_bias="0.343" />
 
     <TextView
         android:id="@+id/textView"
