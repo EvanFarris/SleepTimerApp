@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Alarm> activeAlarmList;
     private Button canButton;
     private TextView noActiveTextView;
+    private int alarmID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,31 +92,31 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Set<String> timeSet = prefs.getStringSet(alarmKey,null);
-        Set<String> idSet = prefs.getStringSet(idKey,null);
+        ArrayList<String> timeList = new ArrayList<>(prefs.getStringSet(alarmKey,null));
+        ArrayList<String> idList = new ArrayList<>(prefs.getStringSet(idKey,null));
         long curTime = Calendar.getInstance().getTimeInMillis();
 
         activeAlarmList.clear();
 
-        if(timeSet != null && idSet !=null) {
-            ArrayList<Long> timeList = new ArrayList<>();
-            ArrayList<Integer> idList = new ArrayList<>();
-
-            for(String s : timeSet) {
-                timeList.add(Long.parseLong(s));
-            }
-            for(String s: idSet) {
-                idList.add(Integer.parseInt(s));
-            }
+        if(timeList.size() > 0 && idList.size() > 0) {
+            int aId;
+            long eTime;
             for(int i = 0; i < timeList.size(); i++) {
-                if (timeList.get(i) > curTime)
-                    activeAlarmList.add(new Alarm(timeList.get(i), idList.get(i)));
+                aId = Integer.parseInt(idList.get(i));
+                eTime = Long.parseLong(timeList.get(i));
+                if(eTime > curTime) {activeAlarmList.add(new Alarm(eTime, aId));}
+                if(aId >= alarmID) {alarmID = aId + 1;}
             }
-            if(activeAlarmList.isEmpty()) {disableButton();}
-            else {enableButton();}
 
-            rAdapter.notifyDataSetChanged();
+            if(activeAlarmList.isEmpty()) {disableButton();}
+            else {
+                activeAlarmList.sort(new AlarmComparator());
+                enableButton();
+            }
+
+            rAdapter.notifyItemRangeChanged(0,activeAlarmList.size());
         }
+        if(activeAlarmList.size() == 0) {alarmID = 0;}
 
     }
 
@@ -135,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView r;
         r = findViewById(R.id.AlarmRecyclerView);
         rAdapter = new ActiveTimerAdapter(activeAlarmList,this);
+        alarmID = -1;
 
         r.setLayoutManager(new LinearLayoutManager(this));
         r.setAdapter(rAdapter);
@@ -241,17 +243,16 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Permission not found",Toast.LENGTH_LONG).show();
             } else {
                 if(!timeTextView.getText().toString().equals("")) {
-                    final int id = (int) Calendar.getInstance().getTimeInMillis();
                     Intent intent  = new Intent(this, SleepReceiver.class);
                     intent.setAction(sleepAction);
-                    PendingIntent alarmIntent = PendingIntent.getBroadcast(this,id,intent,PendingIntent.FLAG_IMMUTABLE);
+                    PendingIntent alarmIntent = PendingIntent.getBroadcast(this,alarmID,intent,PendingIntent.FLAG_IMMUTABLE);
                     long alarmTime = Calendar.getInstance().getTimeInMillis() + Long.parseLong(timeTextView.getText().toString()) * 60000;
 
                     AlarmManager alarmM = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
                     alarmM.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, alarmTime, alarmIntent);
-                    activeAlarmList.add(new Alarm(alarmTime,id));
+                    activeAlarmList.add(new Alarm(alarmTime, alarmID++));
                     activeAlarmList.sort(new AlarmComparator());
-                    rAdapter.notifyDataSetChanged();
+                    rAdapter.notifyItemRangeChanged(0,activeAlarmList.size());
                     Toast.makeText(this, "Sleep timer Created",Toast.LENGTH_LONG).show();
                     clearFields();
                     enableButton();
@@ -277,6 +278,7 @@ public class MainActivity extends AppCompatActivity {
                     alarmM.cancel(alarmIntent);
                     activeAlarmList.remove(activeAlarmPosition);
                     rAdapter.notifyItemRemoved(activeAlarmPosition);
+                    rAdapter.notifyItemRangeChanged(activeAlarmPosition,activeAlarmList.size());
                     activeAlarmPosition = -1;
                     rAdapter.setLastViewBackgroundTransparent();
                     clearFields();

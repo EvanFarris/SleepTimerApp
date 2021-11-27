@@ -48,9 +48,7 @@ public class ActiveTimerAdapter extends RecyclerView.Adapter<ActiveTimerViewHold
         holder.clockTime.setText(dfTime);
         holder.timeRemaining.setText(trStr);
         holder.itemView.setOnClickListener(view -> {
-            if(lastView != null) {
-                lastView.setBackgroundColor(Color.TRANSPARENT);
-            }
+            if(lastView != null) {lastView.setBackgroundColor(Color.TRANSPARENT);}
 
             MainActivity m = (MainActivity) view.getContext();
             int maPos = m.getActiveAlarmPosition();

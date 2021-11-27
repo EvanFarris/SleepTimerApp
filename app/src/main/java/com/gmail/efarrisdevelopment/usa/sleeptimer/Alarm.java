@@ -1,18 +1,18 @@
 package com.gmail.efarrisdevelopment.usa.sleeptimer;
 
 public class Alarm {
-    private long time;
-    private int id;
+    private final long endTime;
+    private final int id;
 
     public Alarm(Alarm a) {
-        time = a.getTime();
+        endTime = a.getTime();
         id = a.getId();
     }
     public Alarm(long t, int i) {
-        time = t;
+        endTime = t;
         id = i;
     }
 
     public int getId() {return id;}
-    public long getTime() {return time;}
+    public long getTime() {return endTime;}
 }
