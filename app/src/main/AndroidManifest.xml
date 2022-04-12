@@ -3,6 +3,7 @@
     package="com.gmail.efarrisdevelopment.usa.sleeptimer">
 
     <uses-permission android:name="com.android.alarm.permission.SET_ALARM"/>
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
 
     <application
         android:allowBackup="true"
@@ -11,6 +12,7 @@
         android:roundIcon="@mipmap/ic_icon_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.PhoneOffJava">
+
         <activity
             android:name="com.gmail.efarrisdevelopment.usa.sleeptimer.MainActivity"
             android:exported="true"
@@ -21,7 +23,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver android:name="com.gmail.efarrisdevelopment.usa.sleeptimer.SleepReceiver" android:permission="android.permission.BIND_DEVICE_ADMIN">
+        <receiver android:name="com.gmail.efarrisdevelopment.usa.sleeptimer.SleepReceiver" android:permission="android.permission.BIND_DEVICE_ADMIN"
+            android:exported="true">
             <meta-data android:name="android.app.device_admin" android:resource="@xml/admin_perms"/>
             <intent-filter>
                 <action android:name="android.app.action.DEVICE_ADMIN_ENABLED"/>

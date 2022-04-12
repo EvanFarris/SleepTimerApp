@@ -23,6 +23,7 @@
         android:id="@+id/minuteTextBox"
         android:layout_width="245dp"
         android:layout_height="84dp"
+        android:layout_marginTop="64dp"
         android:autofillHints="1"
         android:ems="10"
         android:hint="@string/timeEditViewHint"
@@ -33,26 +34,24 @@
         android:tooltipText="@string/timerHelperMessage"
         app:layout_constraintEnd_toEndOf="@+id/textView"
         app:layout_constraintStart_toStartOf="@+id/textView"
-        tools:ignore="SpeakableTextPresentCheck"
-        tools:layout_editor_absoluteY="189dp" />
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        tools:ignore="SpeakableTextPresentCheck" />
 
 
     <Button
         android:id="@+id/sleepButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="64dp"
         android:onClick="clickSleepTimer"
         android:scaleX="1"
         android:scaleY="1"
         android:text="@string/sleepButton"
         android:textSize="32sp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/textView"
         app:layout_constraintHorizontal_bias="0.314"
         app:layout_constraintStart_toStartOf="@+id/textView"
-        app:layout_constraintTop_toBottomOf="@+id/minuteTextBox"
-        app:layout_constraintVertical_bias="0.343" />
+        app:layout_constraintTop_toBottomOf="@+id/minuteTextBox" />
 
     <TextView
         android:id="@+id/textView"
@@ -87,7 +86,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/active_timer"
-        android:textSize="28sp"
+        android:textSize="36sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.62"
@@ -118,5 +117,64 @@
         app:layout_constraintStart_toStartOf="@+id/AlarmRecyclerView"
         app:layout_constraintTop_toTopOf="@+id/AlarmRecyclerView" />
 
+    <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/maAdView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        ads:adSize="BANNER"
+        ads:adUnitId="ca-app-pub-3940256099942544/6300978111"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/quickLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="@string/quickTimerLabel"
+        android:textSize="36sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sleepButton" />
+
+    <Button
+        android:id="@+id/quickTimer1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:onClick="clickQuickTimer"
+        android:text="@string/notSet"
+        android:textSize="28sp"
+        app:layout_constraintEnd_toEndOf="@+id/quickLabel"
+        app:layout_constraintStart_toStartOf="@+id/quickLabel"
+        app:layout_constraintTop_toBottomOf="@+id/quickLabel" />
+
+    <Button
+        android:id="@+id/quickTimer2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:onClick="clickQuickTimer"
+        android:text="@string/notSet"
+        android:textSize="28sp"
+        app:layout_constraintEnd_toEndOf="@+id/quickTimer1"
+        app:layout_constraintStart_toStartOf="@+id/quickTimer1"
+        app:layout_constraintTop_toBottomOf="@+id/quickTimer1" />
+
+    <Button
+        android:id="@+id/quickTimer3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:onClick="clickQuickTimer"
+        android:text="@string/notSet"
+        android:textSize="28sp"
+        app:layout_constraintEnd_toEndOf="@+id/quickTimer2"
+        app:layout_constraintStart_toStartOf="@+id/quickTimer2"
+        app:layout_constraintTop_toBottomOf="@+id/quickTimer2" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

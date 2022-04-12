@@ -22,7 +22,7 @@
         android:id="@+id/minuteTextBox"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="48dp"
         android:autofillHints="1"
         android:ems="10"
         android:hint="@string/timeEditViewHint"
@@ -39,7 +39,7 @@
         android:id="@+id/sleepButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="48dp"
         android:onClick="clickSleepTimer"
         android:scaleX="1"
         android:scaleY="1"
@@ -55,11 +55,11 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="32dp"
         android:text="@string/turnPhoneOffIn"
         android:textSize="28sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.15"
+        app:layout_constraintHorizontal_bias="0.1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -84,7 +84,7 @@
         android:text="@string/active_timer"
         android:textSize="28sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.749"
+        app:layout_constraintHorizontal_bias="0.81"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/textView" />
 
@@ -112,5 +112,58 @@
         app:layout_constraintStart_toStartOf="@+id/AlarmRecyclerView"
         app:layout_constraintTop_toTopOf="@+id/AlarmRecyclerView" />
 
+    <com.google.android.gms.ads.AdView
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/maAdView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        ads:adSize="BANNER"
+        ads:adUnitId="ca-app-pub-3940256099942544/6300978111"
+        />
+
+    <Button
+        android:id="@+id/quickTimer1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:onClick="clickQuickTimer"
+        android:text="@string/notSet"
+        app:layout_constraintEnd_toEndOf="@+id/textView3"
+        app:layout_constraintStart_toStartOf="@+id/textView3"
+        app:layout_constraintTop_toBottomOf="@+id/textView3" />
+
+    <Button
+        android:id="@+id/quickTimer2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="clickQuickTimer"
+        android:text="@string/notSet"
+        app:layout_constraintBottom_toTopOf="@+id/quickTimer3"
+        app:layout_constraintStart_toStartOf="@+id/quickTimer1"
+        app:layout_constraintTop_toBottomOf="@+id/quickTimer1" />
+
+    <Button
+        android:id="@+id/quickTimer3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="clickQuickTimer"
+        android:text="@string/notSet"
+        app:layout_constraintStart_toStartOf="@+id/quickTimer2"
+        app:layout_constraintTop_toTopOf="@+id/sleepButton" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/quickTimerLabel"
+        android:textSize="28sp"
+        app:layout_constraintEnd_toStartOf="@+id/activeTimerText"
+        app:layout_constraintStart_toEndOf="@+id/textView"
+        app:layout_constraintTop_toTopOf="@+id/textView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
