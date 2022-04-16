@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
     private Button qtButton1;
     private Button qtButton2;
     private Button qtButton3;
+    private Button[] qtButtonArray;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,7 +111,10 @@ public class MainActivity extends AppCompatActivity {
 
         alarmID = 0;
         qtList = new int[]{prefs.getInt(qtKey1,0),prefs.getInt(qtKey2,0),prefs.getInt(qtKey3,0)};
-        updateQuickTimeButtons();
+        updateQuickTimeButtons(0);
+        updateQuickTimeButtons(1);
+        updateQuickTimeButtons(2);
+
         if(timeSet != null && idSet != null) {
             timeList = new ArrayList<>(timeSet);
             idList = new ArrayList<>(idSet);
@@ -121,8 +125,9 @@ public class MainActivity extends AppCompatActivity {
 
 
         long curTime = Calendar.getInstance().getTimeInMillis();
-
+        int aListSize = activeAlarmList.size();
         activeAlarmList.clear();
+        rAdapter.notifyItemRangeRemoved(0, aListSize);
 
         if(timeList.size() > 0 && idList.size() > 0) {
             int aId;
@@ -134,14 +139,13 @@ public class MainActivity extends AppCompatActivity {
                 if(aId >= alarmID) {alarmID = aId + 1;}
             }
 
-            if(activeAlarmList.isEmpty()) {disableButton();}
-            else {
+            if(!activeAlarmList.isEmpty()){
                 activeAlarmList.sort(new AlarmComparator());
+                rAdapter.notifyItemRangeChanged(0,activeAlarmList.size());
                 enableButton();
             }
-
-            rAdapter.notifyItemRangeChanged(0,activeAlarmList.size());
         }
+
         if(activeAlarmList.size() == 0) {
             alarmID = 0;
             disableButton();
@@ -165,18 +169,23 @@ public class MainActivity extends AppCompatActivity {
         qtButton1 = findViewById(R.id.quickTimer1);
         qtButton2 = findViewById(R.id.quickTimer2);
         qtButton3 = findViewById(R.id.quickTimer3);
+        qtButtonArray = new Button[3];
+        qtButtonArray[0] = qtButton1;
+        qtButtonArray[1] = qtButton2;
+        qtButtonArray[2] = qtButton3;
 
         r.setLayoutManager(new LinearLayoutManager(this));
         r.setAdapter(rAdapter);
 
+        String permissionType;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            if(ContextCompat.checkSelfPermission(this, Manifest.permission.SCHEDULE_EXACT_ALARM) != PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.SCHEDULE_EXACT_ALARM},1);
-            }
+            permissionType = Manifest.permission.SCHEDULE_EXACT_ALARM;
         } else {
-            if(ContextCompat.checkSelfPermission(this, Manifest.permission.SET_ALARM) != PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.SET_ALARM},1);
-            }
+            permissionType = Manifest.permission.SET_ALARM;
+        }
+
+        if(ContextCompat.checkSelfPermission(this, permissionType) != PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[] {permissionType},1);
         }
 
         if(!active) {createAdmin();}
@@ -259,24 +268,17 @@ public class MainActivity extends AppCompatActivity {
         if(!active) {
             createAdmin();
         } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                if(ContextCompat.checkSelfPermission(this, Manifest.permission.SCHEDULE_EXACT_ALARM) != PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.SCHEDULE_EXACT_ALARM},123);
-                } else {
-                    if(!timeTextView.getText().toString().equals("")) {
-                        createTimer(Long.parseLong(timeTextView.getText().toString()));
-                        clearFields();
-                    }
-                }
+            String perm;
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {perm = Manifest.permission.SCHEDULE_EXACT_ALARM;}
+            else {perm = Manifest.permission.SET_ALARM;}
+
+            if(ContextCompat.checkSelfPermission(this, perm) != PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[] {perm},123);
             } else {
-                if(ContextCompat.checkSelfPermission(this, Manifest.permission.SET_ALARM) != PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.SET_ALARM},123);
-                    Toast.makeText(this, "Permission not found",Toast.LENGTH_LONG).show();
-                } else {
-                    if(!timeTextView.getText().toString().equals("")) {
-                        createTimer(Long.parseLong(timeTextView.getText().toString()));
-                        clearFields();
-                    }
+                if(!timeTextView.getText().toString().equals("")) {
+                    createTimer(Long.parseLong(timeTextView.getText().toString()));
+                    clearFields();
                 }
             }
         }
@@ -374,10 +376,20 @@ public class MainActivity extends AppCompatActivity {
             if(!dialogTB.getText().toString().equals("")) {
                 int num = Integer.parseInt(dialogTB.getText().toString());
                 if(num > 0 && num <= 1440) {
-                    if(buttonNum == 1) {qtList[0] = num;}
-                    else if(buttonNum == 2) {qtList[1] = num;}
-                    else if(buttonNum == 3) {qtList[2] = num;}
-                    updateQuickTimeButtons();
+                    int buttonNumber = -1;
+                    if(buttonNum == 1) {
+                        qtList[0] = num;
+                        buttonNumber = 0;
+                    }
+                    else if(buttonNum == 2) {
+                        qtList[1] = num;
+                        buttonNumber = 1;
+                    }
+                    else if(buttonNum == 3) {
+                        qtList[2] = num;
+                        buttonNumber = 2;
+                    }
+                    updateQuickTimeButtons(buttonNumber);
                 } else {
                     Toast.makeText(this, getString(R.string.validTimer),Toast.LENGTH_LONG).show();
                 }
@@ -387,42 +399,39 @@ public class MainActivity extends AppCompatActivity {
         builder.create().show();
     }
 
-    public void updateQuickTimeButtons() {
+    public void updateQuickTimeButtons(int buttonNumber) {
         String temp;
 
-        if(qtList[0] != 0 && !qtButton1.getText().toString().equals(String.valueOf(qtList[0]).concat(getString(R.string.quickTimerEnding)))){
-            temp = qtList[0] + " " + getString(R.string.quickTimerEnding);
-            qtButton1.setText(temp);
-        } else if (qtList[0] == 0 && !qtButton1.getText().toString().equals(getString(R.string.notSet))) {qtButton1.setText(R.string.notSet);}
-
-        if(qtList[1] != 0 && !qtButton2.getText().toString().equals(String.valueOf(qtList[1]).concat(getString(R.string.quickTimerEnding)))){
-            temp = qtList[1] + " " + getString(R.string.quickTimerEnding);
-            qtButton2.setText(temp);
-        } else if (qtList[1] == 0 && !qtButton2.getText().toString().equals(getString(R.string.notSet))) {qtButton2.setText(R.string.notSet);}
-
-        if(qtList[2] != 0 && !qtButton3.getText().toString().equals(String.valueOf(qtList[2]).concat(getString(R.string.quickTimerEnding)))){
-            temp = qtList[2] + " " + getString(R.string.quickTimerEnding);
-            qtButton3.setText(temp);
-        } else if (qtList[2] == 0 && !qtButton3.getText().toString().equals(getString(R.string.notSet))) {qtButton3.setText(R.string.notSet);}
+        if(qtList[buttonNumber] != 0 && !qtButtonArray[buttonNumber].getText().toString().equals(String.valueOf(qtList[buttonNumber]).concat(getString(R.string.quickTimerEnding)))) {
+            temp = qtList[buttonNumber] + " " + getString(R.string.quickTimerEnding);
+            qtButtonArray[buttonNumber].setText(temp);
+        } else if (qtList[buttonNumber] == 0 && !qtButtonArray[buttonNumber].getText().toString().equals(getString(R.string.notSet))) {qtButtonArray[buttonNumber].setText(R.string.notSet);}
 
     }
 
     public void resetQuickTimer(View v) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Do you want to reset this Quick Timer?");
 
-        builder.setPositiveButton(R.string.yes,(dialogInterface, i) -> {
-            if(v.getId() == R.id.quickTimer1) {
-                qtList[0] = 0;
-            } else if (v.getId() == R.id.quickTimer2) {
-                qtList[1] = 0;
-            } else {
-                qtList[2] = 0;
-            }
-            updateQuickTimeButtons();
-        }).setNegativeButton(R.string.no, (dialogInterface, i) -> {});
+        if((v.getId() == R.id.quickTimer1 && qtList[0] != 0) || (v.getId() == R.id.quickTimer2 && qtList[1] != 0) || (v.getId() == R.id.quickTimer3 && qtList[2] != 0)) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Do you want to reset this Quick Timer?");
 
-        builder.create().show();
+            builder.setPositiveButton(R.string.yes,(dialogInterface, i) -> {
+                int buttonNumber;
+                if(v.getId() == R.id.quickTimer1) {
+                    qtList[0] = 0;
+                    buttonNumber = 0;
+                } else if (v.getId() == R.id.quickTimer2) {
+                    qtList[1] = 0;
+                    buttonNumber = 1;
+                } else {
+                    qtList[2] = 0;
+                    buttonNumber = 2;
+                }
+                updateQuickTimeButtons(buttonNumber);
+            }).setNegativeButton(R.string.no, (dialogInterface, i) -> {});
+
+            builder.create().show();
+        }
     }
 
 }
