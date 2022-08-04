@@ -94,7 +94,7 @@
         android:id="@+id/cancelButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="cancelSleepTimer"
+        android:onClick="destroySleepTimer"
         android:text="@string/cancel_text"
         android:textSize="21sp"
         app:layout_constraintBottom_toTopOf="@+id/maAdView"

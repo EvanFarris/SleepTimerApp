@@ -22,7 +22,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
-import android.text.Selection;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -44,7 +43,6 @@ import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
-    private final String spKey = "ef_sleep_timer";
     private final String idKey = "ef_ids";
     private final String alarmKey = "ef_alarms";
     private final String sleepAction = "goToSleep";
@@ -54,8 +52,7 @@ public class MainActivity extends AppCompatActivity {
     private final String qtKey3 = "ef_qt3";
 
     private int activeAlarmPosition;
-    private boolean active;
-    private TextView timeTextView;
+    private EditText timeTextView;
     private DevicePolicyManager dpm;
     private ComponentName cName;
     private SharedPreferences prefs;
@@ -108,9 +105,9 @@ public class MainActivity extends AppCompatActivity {
 
         alarmID = 0;
         qtList = new int[]{prefs.getInt(qtKey1,0),prefs.getInt(qtKey2,0),prefs.getInt(qtKey3,0)};
-        updateQuickTimeButton(0);
-        updateQuickTimeButton(1);
-        updateQuickTimeButton(2);
+        updateQuickTimerButton(0);
+        updateQuickTimerButton(1);
+        updateQuickTimerButton(2);
 
         if(timeSet != null && idSet != null) {
             timeList = new ArrayList<>(timeSet);
@@ -153,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
         timeTextView = findViewById(R.id.minuteTextBox);
         cName = new ComponentName(this, SleepReceiver.class);
         dpm = (DevicePolicyManager)getSystemService(Context.DEVICE_POLICY_SERVICE);
-        active = dpm.isAdminActive(cName);
+        String spKey = "ef_sleep_timer";
         prefs = getSharedPreferences(spKey,Context.MODE_PRIVATE);
         prefs_editor = prefs.edit();
         activeAlarmList = new ArrayList<>();
@@ -185,7 +182,8 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, new String[] {permissionType},1);
         }
 
-        if(!active) {createAdmin();}
+        //checks if the user has admin privileges to lock the screen
+        checkAdmin();
 
         MobileAds.initialize(this, initializationStatus -> {
         });
@@ -199,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
     public void createAdmin() {
         Intent i = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
         i.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN,cName);
-        i.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION,"The sleep timer locks your phone once the timer ends.");
+        i.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION,"Your phone locks once the sleep timer has elapsed. Locking your phone programmatically needs admin permission");
         startActivity(i);
     }
 
@@ -231,10 +229,8 @@ public class MainActivity extends AppCompatActivity {
                         int time = Integer.parseInt(timeTextView.getText().toString());
                         if(time > maxTimer) {
                             timeTextView.setText(String.valueOf(maxTimer));
-                            Selection.setSelection(editable, timeTextView.getText().toString().length());
-                        }
-                        else {
-                            Selection.setSelection(editable, index);
+                            timeTextView.setSelection(timeTextView.length()
+                            );
                         }
                     }
                 }
@@ -261,10 +257,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void clickSleepTimer(View v) {
-        active = dpm.isAdminActive(cName);
-        if(!active) {
-            createAdmin();
-        } else {
+        if(checkAdmin()) {
             String perm;
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {perm = Manifest.permission.SCHEDULE_EXACT_ALARM;}
@@ -296,7 +289,7 @@ public class MainActivity extends AppCompatActivity {
         enableButton();
     }
 
-    public void cancelSleepTimer(View v) {
+    public void destroySleepTimer(View v) {
         if(activeAlarmPosition != -1) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             long timerToCancel = activeAlarmList.get(activeAlarmPosition).getTime();
@@ -346,8 +339,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void clickQuickTimer(View v) {
         int vId = getButtonNum(v);
-        if(qtList[vId] != 0) {
-            createSleepTimer(qtList[vId]);}
+        if(qtList[vId] != 0) {if(checkAdmin()) {createSleepTimer(qtList[vId]);}}
         else {quickTimerDialog(vId);}
     }
 
@@ -364,7 +356,7 @@ public class MainActivity extends AppCompatActivity {
                 int num = Integer.parseInt(dialogTB.getText().toString());
                 if(num > 0 && num <= 1440) {
                     qtList[buttonNum] = num;
-                    updateQuickTimeButton(buttonNum);
+                    updateQuickTimerButton(buttonNum);
                 } else {
                     Toast.makeText(this, getString(R.string.validTimer),Toast.LENGTH_LONG).show();
                 }
@@ -374,7 +366,7 @@ public class MainActivity extends AppCompatActivity {
         builder.create().show();
     }
 
-    public void updateQuickTimeButton(int buttonNumber) {
+    public void updateQuickTimerButton(int buttonNumber) {
         String temp;
 
         if(qtList[buttonNumber] == 0) {temp = getString(R.string.notSet);}
@@ -392,7 +384,7 @@ public class MainActivity extends AppCompatActivity {
 
             builder.setPositiveButton(R.string.yes,(dialogInterface, i) -> {
                 qtList[buttonNum] = 0;
-                updateQuickTimeButton(buttonNum);
+                updateQuickTimerButton(buttonNum);
             }).setNegativeButton(R.string.no, (dialogInterface, i) -> {});
 
             builder.create().show();
@@ -406,6 +398,13 @@ public class MainActivity extends AppCompatActivity {
         else if(buttonNum == R.id.quickTimer2) {return 1;}
         else if (buttonNum == R.id.quickTimer3) {return 2;}
         else {return -1;}
+    }
+
+    public boolean checkAdmin() {
+        if(!dpm.isAdminActive(cName)) {
+            createAdmin();
+            return false;
+        } else {return true;}
     }
 
 }

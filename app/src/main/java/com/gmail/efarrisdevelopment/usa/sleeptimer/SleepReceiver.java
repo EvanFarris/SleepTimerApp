@@ -2,6 +2,7 @@ package com.gmail.efarrisdevelopment.usa.sleeptimer;
 
 import android.app.admin.DeviceAdminReceiver;
 import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioAttributes;
@@ -13,7 +14,11 @@ public class SleepReceiver extends DeviceAdminReceiver {
     public void onReceive(Context context, Intent intent) {
         if(intent.getAction().equals("goToSleep")) {
                 DevicePolicyManager dpm = (DevicePolicyManager) context.getApplicationContext().getSystemService(Context.DEVICE_POLICY_SERVICE);
-                dpm.lockNow();
+                ComponentName cName = new ComponentName(context.getApplicationContext(),SleepReceiver.class);
+                if(dpm.isAdminActive(cName)){
+                    dpm.lockNow();
+                }
+
 
                 AudioAttributes aAttr = new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_GAME).setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build();
                 AudioFocusRequest aRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN).setAudioAttributes(aAttr).build();
