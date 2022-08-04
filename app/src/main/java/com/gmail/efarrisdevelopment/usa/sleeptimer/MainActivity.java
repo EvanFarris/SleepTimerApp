@@ -2,7 +2,6 @@ package com.gmail.efarrisdevelopment.usa.sleeptimer;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -35,8 +34,6 @@ import android.widget.Toast;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.initialization.InitializationStatus;
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 
 
 import java.util.ArrayList;
@@ -111,9 +108,9 @@ public class MainActivity extends AppCompatActivity {
 
         alarmID = 0;
         qtList = new int[]{prefs.getInt(qtKey1,0),prefs.getInt(qtKey2,0),prefs.getInt(qtKey3,0)};
-        updateQuickTimeButtons(0);
-        updateQuickTimeButtons(1);
-        updateQuickTimeButtons(2);
+        updateQuickTimeButton(0);
+        updateQuickTimeButton(1);
+        updateQuickTimeButton(2);
 
         if(timeSet != null && idSet != null) {
             timeList = new ArrayList<>(timeSet);
@@ -123,7 +120,6 @@ public class MainActivity extends AppCompatActivity {
             idList = new ArrayList<>();
         }
 
-
         long curTime = Calendar.getInstance().getTimeInMillis();
         int aListSize = activeAlarmList.size();
         activeAlarmList.clear();
@@ -132,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
         if(timeList.size() > 0 && idList.size() > 0) {
             int aId;
             long eTime;
+
             for(int i = 0; i < timeList.size(); i++) {
                 aId = Integer.parseInt(idList.get(i));
                 eTime = Long.parseLong(timeList.get(i));
@@ -234,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
                         int time = Integer.parseInt(timeTextView.getText().toString());
                         if(time > maxTimer) {
                             timeTextView.setText(String.valueOf(maxTimer));
-                            Selection.setSelection(editable, timeTextView.getText().length());
+                            Selection.setSelection(editable, timeTextView.getText().toString().length());
                         }
                         else {
                             Selection.setSelection(editable, index);
@@ -277,14 +274,14 @@ public class MainActivity extends AppCompatActivity {
                 ActivityCompat.requestPermissions(this, new String[] {perm},123);
             } else {
                 if(!timeTextView.getText().toString().equals("")) {
-                    createTimer(Long.parseLong(timeTextView.getText().toString()));
+                    createSleepTimer(Long.parseLong(timeTextView.getText().toString()));
                     clearFields();
                 }
             }
         }
     }
 
-    public void createTimer(long minutes) {
+    public void createSleepTimer(long minutes) {
         Intent intent  = new Intent(this, SleepReceiver.class);
         intent.setAction(sleepAction);
         PendingIntent alarmIntent = PendingIntent.getBroadcast(this,alarmID,intent,PendingIntent.FLAG_IMMUTABLE);
@@ -299,7 +296,7 @@ public class MainActivity extends AppCompatActivity {
         enableButton();
     }
 
-    public void cancelAlarm(View v) {
+    public void cancelSleepTimer(View v) {
         if(activeAlarmPosition != -1) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             long timerToCancel = activeAlarmList.get(activeAlarmPosition).getTime();
@@ -348,20 +345,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void clickQuickTimer(View v) {
-        int buttonPressed = v.getId();
-        if(buttonPressed == R.id.quickTimer1) {
-            if(qtList[0] != 0) {
-                createTimer(qtList[0]);
-            } else {quickTimerDialog(1);}
-        } else if (buttonPressed == R.id.quickTimer2) {
-            if(qtList[1] != 0) {
-                createTimer(qtList[1]);
-            } else {quickTimerDialog(2);}
-        } else if (buttonPressed == R.id.quickTimer3) {
-            if(qtList[2] != 0) {
-                createTimer(qtList[2]);
-            } else {quickTimerDialog(3);}
-        }
+        int vId = getButtonNum(v);
+        if(qtList[vId] != 0) {
+            createSleepTimer(qtList[vId]);}
+        else {quickTimerDialog(vId);}
     }
 
     public void quickTimerDialog(int buttonNum) {
@@ -376,20 +363,8 @@ public class MainActivity extends AppCompatActivity {
             if(!dialogTB.getText().toString().equals("")) {
                 int num = Integer.parseInt(dialogTB.getText().toString());
                 if(num > 0 && num <= 1440) {
-                    int buttonNumber = -1;
-                    if(buttonNum == 1) {
-                        qtList[0] = num;
-                        buttonNumber = 0;
-                    }
-                    else if(buttonNum == 2) {
-                        qtList[1] = num;
-                        buttonNumber = 1;
-                    }
-                    else if(buttonNum == 3) {
-                        qtList[2] = num;
-                        buttonNumber = 2;
-                    }
-                    updateQuickTimeButtons(buttonNumber);
+                    qtList[buttonNum] = num;
+                    updateQuickTimeButton(buttonNum);
                 } else {
                     Toast.makeText(this, getString(R.string.validTimer),Toast.LENGTH_LONG).show();
                 }
@@ -399,39 +374,38 @@ public class MainActivity extends AppCompatActivity {
         builder.create().show();
     }
 
-    public void updateQuickTimeButtons(int buttonNumber) {
+    public void updateQuickTimeButton(int buttonNumber) {
         String temp;
 
-        if(qtList[buttonNumber] != 0 && !qtButtonArray[buttonNumber].getText().toString().equals(String.valueOf(qtList[buttonNumber]).concat(getString(R.string.quickTimerEnding)))) {
-            temp = qtList[buttonNumber] + " " + getString(R.string.quickTimerEnding);
-            qtButtonArray[buttonNumber].setText(temp);
-        } else if (qtList[buttonNumber] == 0 && !qtButtonArray[buttonNumber].getText().toString().equals(getString(R.string.notSet))) {qtButtonArray[buttonNumber].setText(R.string.notSet);}
+        if(qtList[buttonNumber] == 0) {temp = getString(R.string.notSet);}
+        else {temp = qtList[buttonNumber] + " " + getString(R.string.quickTimerEnding);}
 
+        qtButtonArray[buttonNumber].setText(temp);
     }
 
     public void resetQuickTimer(View v) {
+        int buttonNum = getButtonNum(v);
 
-        if((v.getId() == R.id.quickTimer1 && qtList[0] != 0) || (v.getId() == R.id.quickTimer2 && qtList[1] != 0) || (v.getId() == R.id.quickTimer3 && qtList[2] != 0)) {
+        if(buttonNum != -1 && qtList[buttonNum] != 0) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Do you want to reset this Quick Timer?");
 
             builder.setPositiveButton(R.string.yes,(dialogInterface, i) -> {
-                int buttonNumber;
-                if(v.getId() == R.id.quickTimer1) {
-                    qtList[0] = 0;
-                    buttonNumber = 0;
-                } else if (v.getId() == R.id.quickTimer2) {
-                    qtList[1] = 0;
-                    buttonNumber = 1;
-                } else {
-                    qtList[2] = 0;
-                    buttonNumber = 2;
-                }
-                updateQuickTimeButtons(buttonNumber);
+                qtList[buttonNum] = 0;
+                updateQuickTimeButton(buttonNum);
             }).setNegativeButton(R.string.no, (dialogInterface, i) -> {});
 
             builder.create().show();
         }
+    }
+
+    public int getButtonNum(View v) {
+        int buttonNum = v.getId();
+
+        if(buttonNum == R.id.quickTimer1) {return 0;}
+        else if(buttonNum == R.id.quickTimer2) {return 1;}
+        else if (buttonNum == R.id.quickTimer3) {return 2;}
+        else {return -1;}
     }
 
 }
